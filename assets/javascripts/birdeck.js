@@ -2,6 +2,7 @@ $(document).ready(function() {
   fetchPosts();
   createPost();
   fetchPostsButton();
+  deletePost();
 });
 
 function fetchPosts() {
@@ -47,12 +48,33 @@ function renderPost(post) {
     + post.created_at
     + '</h6><p>'
     + post.description
-    + '</p></div>'
+    + '</p><button class="delete-post btn btn-default btn-xs">Delete</button></div>'
     );
 };
 
 function fetchPostsButton() {
   $('#button-fetch').on('click', function() {
     fetchPosts();
+  });
+};
+
+function deletePost() {
+  // Must use delegate because delete button may not exist yet.
+  $('#latest-posts').delegate('.delete-post', 'click', function() {
+    var $post = $(this).closest('.post');
+
+    $.ajax({
+      type: 'DELETE',
+      url: 'https://turing-birdie.herokuapp.com/api/v1/posts/'
+        + $post.attr('data-id')
+        + '.json',
+      success: function() {
+        $post.remove();
+      },
+      error: function() {
+        // Assuming post was already removed by another request
+        $post.remove();
+      }
+    });
   });
 };
