@@ -1,15 +1,20 @@
 $(document).ready(function() {
   fetchPosts();
   createPost();
+  fetchPostsButton();
 });
 
 function fetchPosts() {
+  var newestPostId = parseInt($('.post').last().attr('data-id'));
+
   $.ajax({
     type: 'GET',
     url:  'https://turing-birdie.herokuapp.com/api/v1/posts.json',
     success: function(posts) {
       $.each(posts, function(index, post) {
-        renderPost(post);
+        if (isNaN(newestPostId) || post.id > newestPostId) {
+          renderPost(post);
+        }
       });
     }
   });
@@ -44,4 +49,10 @@ function renderPost(post) {
     + post.description
     + '</p></div>'
     );
+};
+
+function fetchPostsButton() {
+  $('#button-fetch').on('click', function() {
+    fetchPosts();
+  });
 };
